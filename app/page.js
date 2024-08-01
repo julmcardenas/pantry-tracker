@@ -8,6 +8,7 @@ import { AddStockModal } from '@/components/AddStockModal';
 import SearchAppBar from '@/components/SearchAppBar';
 import InventoryTable from '@/components/Table';
 import InventoryStyledTable from '@/components/StyledTable';
+import ToggleFilter from '@/components/Filter';
 
 
 
@@ -23,6 +24,7 @@ export default function Home() {
 
   const [itemName, setItemName] = useState('');
   const [itemCount, setItemCount] = useState(0);
+  const [inStockToggle, setInStockToggle] = useState("all");
 
   const updatePantry = async () => {
     const q = query(pantryRef);
@@ -89,9 +91,23 @@ export default function Home() {
     setPantry(filteredPantry);
   }
 
+  const filterPantry = async (inStock) => {
+    setInStockToggle(inStock);
+    const q = query(pantryRef);
+    const querySnapshot = await getDocs(q);
+    const pantryList = [];
+    querySnapshot.forEach((doc) => {
+      pantryList.push({ "name": doc.id, ...doc.data() });
+    });
+
+    const filteredPantry = inStock === "all" ? pantryList : inStock === "inStock" ? pantryList.filter((item) => item.count > 0) : pantryList.filter((item) => item.count === 0);
+    setPantry(filteredPantry);
+  }
+
   return (
     <>
       <SearchAppBar searchPantry={searchPantry} />
+      
       <Box
         display="flex"
         marginTop={12}
@@ -103,29 +119,15 @@ export default function Home() {
         gap={2}
       >
 
-
         <AddItemModal open={openAddNewItem} handleCloseItem={handleCloseItem} addItemSingle={addItemSingle} itemName={itemName} setItemName={setItemName} />
         <AddStockModal open={openAddNewStock} handleClose={handleCloseStock} add={addStock} itemName={itemName} setItemName={setItemName} itemCount={itemCount} setItemCount={setItemCount} />
-
-        {/* <Box
-        width={"800px"}
-        height={"100px"}
-        bgcolor={'#ADD8E6'}
-        display={'flex'}
-        justifyContent={'center'}
-        alignItems={'center'}
-      >
-
-        <Typography variant='h2' color={'#333'} textAlign={'center'}>
-          Pantry Items
-        </Typography>
-      </Box> */}
 
         <Box
           display="flex"
           flexDirection={'row'}
           gap={2}
         >
+          <ToggleFilter inStockToggle={inStockToggle} filterPantry={filterPantry} />
           <Button variant='contained' onClick={handleOpenItem}>Add Item</Button>
           <Button variant='contained' onClick={handleOpenStock}>Add Stock</Button>
         </Box>
@@ -134,50 +136,6 @@ export default function Home() {
           <InventoryStyledTable items={pantry} removeItemSingle={removeItemSingle} addItemSingle={addItemSingle} deleteItemStock={deleteItemStock} />
         </Box>
 
-        {/* <Box border={'1px solid #333'}>
-        <Stack
-          // width="800px"
-          // height={'auto'}
-          spacing={2}
-          overflow={'scroll'}
-        >
-
-
-          {pantry.map((item) => (
-            <Box
-              key={item.name}
-              width={'100%'}
-              minHeight={'100px'}
-              display={'flex'}
-              justifyContent={'space-between'}
-              alignItems={'center'}
-              paddingX={5}
-              gap={5}
-              bgcolor={'#f0f0f0'}
-            >
-
-              <Typography
-                variant='h3'
-                color={'#333'}
-                textAlign={'center'}
-              >
-                {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
-              </Typography>
-
-              <Box >
-              <Chip label={item.count === 0 ? "Out Of Stock" : "In Stock"} color={item.count === 0 ? "error" : "success"} variant="outlined" />
-              </Box>
-
-              <Box display={'flex'} gap={2} justifyContent={'center'} alignItems={'center'}>
-                <Box><Button variant='contained' onClick={() => removeItemSingle(item.name)} disabled={item.count === 0}> - </Button></Box>
-                <Typography variant='h3' color={'#333'} textAlign={'center'}> {item.count} </Typography>
-                <Box><Button variant='contained' onClick={() => addItemSingle(item.name)}> + </Button></Box>
-                <IconButton aria-label="delete" onClick={() => deleteItemStock(item.name)}> <DeleteIcon /> </IconButton>
-              </Box>
-            </Box>
-          ))}
-        </Stack>
-      </Box> */}
       </Box>
     </>
   );
