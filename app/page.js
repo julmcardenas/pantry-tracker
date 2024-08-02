@@ -9,7 +9,7 @@ import SearchAppBar from '@/components/SearchAppBar';
 import InventoryStyledTable from '@/components/StyledTable';
 import ToggleFilter from '@/components/Filter';
 import { CameraModal } from '@/components/CameraModal';
-
+import analyzeImage from './openai';
 
 
 export default function Home() {
@@ -115,7 +115,7 @@ export default function Home() {
     setTempImage(scan);
     // analyze image to get item name and then show item modal
     
-    // const itemName = await analyzeImage(scan);
+    const itemName = await analyzeImage(scan);
     // use CPT vision api classify image based on whats already in the pantry
 
     // if item is already in pantry, show add stock modal
