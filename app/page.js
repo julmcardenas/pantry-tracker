@@ -9,7 +9,6 @@ import SearchAppBar from '@/components/SearchAppBar';
 import InventoryStyledTable from '@/components/StyledTable';
 import ToggleFilter from '@/components/Filter';
 import { CameraModal } from '@/components/CameraModal';
-import analyzeImage from './openai';
 
 
 export default function Home() {
@@ -110,21 +109,6 @@ export default function Home() {
     setPantry(filteredPantry);
   }
 
-  const scanItem = async (scan) => {
-    console.log("scanning item", scan);
-    setTempImage(scan);
-    // analyze image to get item name and then show item modal
-    
-    const itemName = await analyzeImage(scan);
-    // use CPT vision api classify image based on whats already in the pantry
-
-    // if item is already in pantry, show add stock modal
-    // if item is not in pantry, show add item modal
-
-    // setItemName(itemName);
-    // setOpenAddNewItem(true);
-  }
-
   return (
     <>
       <SearchAppBar searchPantry={searchPantry} />
@@ -142,7 +126,7 @@ export default function Home() {
 
         <AddItemModal open={openAddNewItem} handleCloseItem={handleCloseItem} addItemSingle={addItemSingle} itemName={itemName} setItemName={setItemName} />
         <AddStockModal open={openAddNewStock} handleClose={handleCloseStock} add={addStock} itemName={itemName} setItemName={setItemName} itemCount={itemCount} setItemCount={setItemCount} />
-        <CameraModal open={openCamera} handleClose={handleCloseCamera} scanItem={scanItem} />
+        <CameraModal open={openCamera} handleClose={handleCloseCamera} updatePantry={updatePantry} />
         {/* <MyCamera /> */}
 
         <Box

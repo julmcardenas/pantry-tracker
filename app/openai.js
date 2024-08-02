@@ -9,16 +9,33 @@ export default async function analyzeImage(image){
         messages: [
             {
                 role: 'system',
-                content: 'You are a helpful assistant.'
+                content: [
+                    {
+                        type: 'text',
+                        text: 'You are a inventory management system that can identify items from images. Return only the name of the item.'
+                    }
+                ]
             },
             {
                 role: 'user',
-                content: 'What is the meaning of life?'
+                content: [
+                    {
+                        type: 'text',
+                        text: 'Identify the item in this image and only return the name of the item'
+                    },
+                    {
+                        type: 'image_url',
+                        image_url: {
+                            url: image,
+                            detail: 'low'
+                        }
+                    }
+                ]
             }
         ]
     })
-    
-    console.log(response.choices[0])
-    return "cat";
+    const itemName = response.choices[0].message.content
+    console.log(itemName);
+    return itemName;
 
 }
