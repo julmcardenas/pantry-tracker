@@ -6,9 +6,9 @@ import { app, db, pantryRef } from '../firebase';
 import { AddItemModal } from '@/components/AddItemModal';
 import { AddStockModal } from '@/components/AddStockModal';
 import SearchAppBar from '@/components/SearchAppBar';
-import InventoryTable from '@/components/Table';
 import InventoryStyledTable from '@/components/StyledTable';
 import ToggleFilter from '@/components/Filter';
+import { CameraModal } from '@/components/CameraModal';
 
 
 
@@ -22,9 +22,15 @@ export default function Home() {
   const handleOpenStock = () => setOpenAddNewStock(true);
   const handleCloseStock = () => setOpenAddNewStock(false);
 
+  const [openCamera, setOpenCamera] = useState(false);
+  const handleOpenCamera = () => setOpenCamera(true);
+  const handleCloseCamera = () => setOpenCamera(false);
+
   const [itemName, setItemName] = useState('');
   const [itemCount, setItemCount] = useState(0);
   const [inStockToggle, setInStockToggle] = useState("all");
+
+  const [tempImage, setTempImage] = useState(null);
 
   const updatePantry = async () => {
     const q = query(pantryRef);
@@ -104,10 +110,25 @@ export default function Home() {
     setPantry(filteredPantry);
   }
 
+  const scanItem = async (scan) => {
+    console.log("scanning item", scan);
+    setTempImage(scan);
+    // analyze image to get item name and then show item modal
+    
+    // const itemName = await analyzeImage(scan);
+    // use CPT vision api classify image based on whats already in the pantry
+
+    // if item is already in pantry, show add stock modal
+    // if item is not in pantry, show add item modal
+
+    // setItemName(itemName);
+    // setOpenAddNewItem(true);
+  }
+
   return (
     <>
       <SearchAppBar searchPantry={searchPantry} />
-      
+
       <Box
         display="flex"
         marginTop={12}
@@ -121,6 +142,8 @@ export default function Home() {
 
         <AddItemModal open={openAddNewItem} handleCloseItem={handleCloseItem} addItemSingle={addItemSingle} itemName={itemName} setItemName={setItemName} />
         <AddStockModal open={openAddNewStock} handleClose={handleCloseStock} add={addStock} itemName={itemName} setItemName={setItemName} itemCount={itemCount} setItemCount={setItemCount} />
+        <CameraModal open={openCamera} handleClose={handleCloseCamera} scanItem={scanItem} />
+        {/* <MyCamera /> */}
 
         <Box
           display="flex"
@@ -130,11 +153,15 @@ export default function Home() {
           <ToggleFilter inStockToggle={inStockToggle} filterPantry={filterPantry} />
           <Button variant='contained' onClick={handleOpenItem}>Add Item</Button>
           <Button variant='contained' onClick={handleOpenStock}>Add Stock</Button>
+          <Button variant='outlined' onClick={handleOpenCamera}>Scan Item</Button>
+          
         </Box>
 
         <Box minWidth={'90%'}>
           <InventoryStyledTable items={pantry} removeItemSingle={removeItemSingle} addItemSingle={addItemSingle} deleteItemStock={deleteItemStock} />
         </Box>
+
+        <Box component={'img'} src={tempImage} />
 
       </Box>
     </>
